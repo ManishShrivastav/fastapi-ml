@@ -22,6 +22,11 @@ class Patient(BaseModel):
         
         return value
     
+    @field_validator("name")
+    @classmethod
+    def transform_name(cls, value):
+        return value.upper()
+
 def insert_patient_data(patient: Patient):
     print(patient.name)
     print(patient.age)
@@ -34,7 +39,7 @@ def update_patient_data(patient: Patient):
     print("Updating patient data in the database...")
 
 patient_info = {"name": "nitin", 
-                'email': "abc@gmail.com",
+                'email': "abc@hdfc.com",
                 "age": "30", 
                 "weight": 75.5, 
                 "married": True, 
