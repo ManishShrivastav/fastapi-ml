@@ -1,15 +1,22 @@
-from pydantic import BaseModel, EmailStr, AnyUrl, Field, field_validator, model_validator
+from pydantic import BaseModel, EmailStr, AnyUrl, Field, field_validator, model_validator, computed_field
 from typing import Dict, List, Optional, Annotated
 
 class Patient(BaseModel):
     name: str
     email: EmailStr
     age: int
-    weight: float
+    weight: float #kg
+    height: float = Field(gt=0, description="Height must be a positive number") #meters
     married: bool
     allergies: List[str]
     contact_details: Dict[str, str]
     linkedin_url: Optional[AnyUrl] = None
+
+    @computed_field
+    @property
+    def calculate_bmi(self) -> float:
+        bmi = round(self.weight / (self.height ** 2), 2)
+        return bmi
 
     @model_validator(mode="after")
     def validate_emergency_contact(cls, model):
@@ -51,12 +58,14 @@ def insert_patient_data(patient: Patient):
 def update_patient_data(patient: Patient):
     print(patient.name)
     print(patient.age)
+    print('BMI:', patient.calculate_bmi)
     print("Updating patient data in the database...")
 
 patient_info = {"name": "nitin", 
                 'email': "abc@hdfc.com",
                 "age": "65", 
                 "weight": 75.5, 
+                "height": 1.72,
                 "married": True, 
                 "allergies": ["pollen", "dust"], 
                 "contact_details": {"email": "nitin@example.com", "phone": "1234567890", "emergency_contact": "9876543210"},
