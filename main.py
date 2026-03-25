@@ -11,7 +11,7 @@ class Patient(BaseModel):
     name: Annotated[str, Field(..., description="The name of the patient", example="John Doe")]
     city: Annotated[str, Field(..., description="The city where the patient resides", example="New York")]
     age: Annotated[int, Field(..., gt=0, lt=120, description="The age of the patient", example=30)]
-    gender: Annotated[Literal["Male", "Female", "Other"], Field(..., description="The gender of the patient", example="Male")]
+    gender: Annotated[Literal["male", "female", "other"], Field(..., description="The gender of the patient", example="male")]
     height: Annotated[float, Field(..., gt=0, description="The height of the patient in meters", example=1.75)]
     weight: Annotated[float, Field(..., gt=0, description="The weight of the patient in kilograms", example=70.0)]
 
@@ -32,6 +32,16 @@ class Patient(BaseModel):
             return "Overweight"
         else:
             return "Obese"
+        
+
+class PatientUpdate(BaseModel):
+    name: Annotated[str | None, Field(default=None, description="The name of the patient", example="John Doe")] # str | None explicitly tells Pydantic the field is nullable.
+                                                                                                                # default=None makes it not required.
+    city: Annotated[str | None, Field(default=None, description="The city where the patient resides", example="New York")]
+    age: Annotated[int | None, Field(default=None, gt=0, lt=120, description="The age of the patient", example=30)]
+    gender: Annotated[Literal["male", "female", "other"] | None, Field(default=None, description="The gender of the patient", example="male")]
+    height: Annotated[float | None, Field(default=None, gt=0, description="The height of the patient in meters", example=1.75)]
+    weight: Annotated[float | None, Field(default=None, gt=0, description="The weight of the patient in kilograms", example=70.0)]
 
 def load_patients():
     with open("patients.json", "r") as f:
@@ -103,3 +113,31 @@ def add_patient(patient: Patient):
     save_patients(patients)
 
     return JSONResponse(content={"message": f"Patient with ID {patient.id} added successfully"}, status_code=201)
+
+
+@app.put("/update-patient/{patient_id}")
+def update_patient(patient_id: str , patient_update: PatientUpdate):
+    patients = load_patients()
+
+    if patient_id not in patients:
+        raise HTTPException(status_code=404, detail=f"Patient with ID {patient_id} not found")
+    
+    existing_patient_info = patients[patient_id]
+
+    updated_patient_info = patient_update.model_dump(exclude_unset=True)
+    
+    for key, value in updated_patient_info.items():
+        if value is not None:
+            existing_patient_info[key] = value
+
+    # existing_patient_info -> pydantic object -> updated bmi and verdict -> dict -> update the patient info in the patients dict
+    existing_patient_info['id'] = patient_id # we need to add the id back to the existing_patient_info before creating the Patient object, otherwise it will raise a validation error since id is a required field in the Patient model.
+    updated_patient = Patient(**existing_patient_info) # this will automatically update the bmi and verdict based on the updated height and weight
+    existing_patient_info = updated_patient.model_dump(exclude=['id']) # we need to exclude the id when updating the existing_patient_info since the id is not stored in the patients dict, it's only used as the key in the patients dict.
+
+    # Update the patient info in the patients dict
+    patients[patient_id] = existing_patient_info
+    
+    save_patients(patients)
+
+    return JSONResponse(content={"message": f"Patient with ID {patient_id} updated successfully"}, status_code=200)
