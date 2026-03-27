@@ -74,7 +74,10 @@ class UserInput(BaseModel):
             return 2
         else:
             return 3
-        
+
+@app.get("/")
+def home():
+    return {"message": "Welcome to the Health Insurance Premium Prediction API."}      
 
 @app.post("/predict")
 def predict(input_data: UserInput):
