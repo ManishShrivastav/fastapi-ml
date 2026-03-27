@@ -144,6 +144,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+pydantic_practice/
 
 # Spyder project settings
 .spyderproject
