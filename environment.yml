@@ -1,0 +1,11 @@
+name: /home/manish/Desktop/fastapi-ml/venv
+channels:
+  - defaults
+dependencies:
+  - python=3.11.15
+  - fastapi
+  - ipykernel
+  - pandas
+  - scikit-learn
+  - streamlit
+prefix: /home/manish/Desktop/fastapi-ml/venv
