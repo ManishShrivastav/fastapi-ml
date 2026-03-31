@@ -1,7 +1,6 @@
 
 # Use Miniconda3 base image with Python 3.11
-FROM continuumio/miniconda3:23.11.0-1-py311
-
+FROM continuumio/miniconda3:latest
 
 # Set the working directory in the container
 WORKDIR /app
@@ -26,4 +25,4 @@ EXPOSE 8000
 
 
 # Command to run the application using the conda environment
-CMD ["conda", "run", "-n", "venv", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["conda", "run", "--no-capture-output", "-n", "venv", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
