@@ -1,4 +1,4 @@
-name: /home/manish/Desktop/fastapi-ml/venv
+name: venv
 channels:
   - defaults
 dependencies:
@@ -8,4 +8,3 @@ dependencies:
   - pandas
   - scikit-learn
   - streamlit
-prefix: /home/manish/Desktop/fastapi-ml/venv
