@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result</title>
+</head>
+<body>
+    <h2>Multiplication Table for {{ number }}</h2>
+    <ul>
+        {% for n, i, result in table %}
+            <li>{{ n }} x {{ i }} = {{ result }}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="/">Try another number</a>
+</body>
+</html>
